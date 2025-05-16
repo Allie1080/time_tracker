@@ -7,7 +7,7 @@ import "dart:convert";
 import "../models/time_entry.dart";
 import "../models/project.dart";
 import "../models/task.dart";
-import "../consts.dart";
+import "../constants/basic.dart";
 
 class AppProvider with ChangeNotifier {
   final LocalStorage storage;
@@ -127,12 +127,32 @@ class AppProvider with ChangeNotifier {
 
   }
 
+  void updateTaskName(int id, String newName) {
+    newName = _checkDuplicateName(newName, _tasks);
+
+    _tasks.firstWhere((task) => task.id == id).name = newName;
+
+    _saveTasksToStorage();
+    notifyListeners();
+
+  }
+
   void deleteTask(int id) {
+    for (var entry in _entries) {
+      if (entry.taskId == id) {
+        _entries.remove(entry);
+        notifyListeners();
+
+      }
+
+    }
+    
     _tasks.removeWhere((task) => task.id == id);
     _saveTasksToStorage();
     notifyListeners();
 
   }
+
   void addProject(String name) {
     name = _checkDuplicateName(name, _projects);
 
@@ -145,14 +165,33 @@ class AppProvider with ChangeNotifier {
 
   }
 
-  void deleteProject(String id) {
+  void updateProjectName(int id, String newName) {
+    newName = _checkDuplicateName(newName, _projects);
+
+    _projects.firstWhere((project) => project.id == id).name = newName;
+
+    _saveProjectsToStorage();
+    notifyListeners();
+
+  }
+
+  void deleteProject(int id) {
+    for (var entry in _entries) {
+      if (entry.projectId == id) {
+        _entries.remove(entry);
+        notifyListeners();
+
+      }
+
+    }
+    
     _tasks.removeWhere((project) => project.id == id);
     _saveProjectsToStorage();
     notifyListeners();
 
   }
 
-  String _checkDuplicateName(String name, List<dynamic> list) { 
+  String _checkDuplicateName(String name, List<dynamic> existingInstances) { 
     String temp = name;
     bool isNew = false;
 
@@ -162,7 +201,7 @@ class AppProvider with ChangeNotifier {
 
     }
 
-    for (int occurences = (isNew) ? 2 : 1; list.any((item) => item.name == name); occurences++) {
+    for (int occurences = (isNew) ? 2 : 1; existingInstances.any((item) => item.name == name); occurences++) {
       name = "$temp ($occurences)";  
 
     }

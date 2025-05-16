@@ -2,10 +2,10 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:localstorage/localstorage.dart";
 
-import "package:google_fonts/google_fonts.dart";
 
 import "providers/project_task_provider.dart";
-import "consts.dart";
+
+import "constants/colors.dart";
 
 import "screens/home_screen.dart";
 
