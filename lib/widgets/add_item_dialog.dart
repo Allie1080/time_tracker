@@ -5,13 +5,12 @@ import "../constants/colors.dart";
 
 import "../providers/project_task_provider.dart";
 
-Future<dynamic> buildEditItemDialog(
+Future<dynamic> buildAddItemDialog(
   BuildContext context, 
   AppProvider provider,  
   TextEditingController controller,
   String title,
   String hintText,
-  int id,
   ItemTypes itemType) {
 
   return showDialog<void>(
@@ -42,19 +41,19 @@ Future<dynamic> buildEditItemDialog(
               backgroundColor: orange,
               foregroundColor: white,
             ),
-            child: Text("Save", style: TextStyle()),
+            child: Text("Add", style: TextStyle()),
             onPressed: () {
               switch (itemType) {
                 case ItemTypes.project:
-                  provider.updateProjectName(id, controller.text);
+                  provider.addProject(controller.text);
                   break;
                 
                 case ItemTypes.task:
-                  provider.updateTaskName(id, controller.text);
+                  provider.addTask(controller.text);
                   break;
                 
                 case ItemTypes.timeEntry:
-                  print("No");
+                  print("This will never be used for that");
                   break;
               
               }

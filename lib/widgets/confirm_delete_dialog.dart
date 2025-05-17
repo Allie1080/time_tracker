@@ -22,7 +22,7 @@ Future<dynamic> buildConfirmDeletionDialog(
             actions: <Widget>[
               TextButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: orange,
+                  backgroundColor: white,
                   foregroundColor: black,
                 ), 
                 child: Text('Cancel'),

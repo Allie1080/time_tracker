@@ -36,6 +36,27 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
 
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
+      builder:(context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: swamp, 
+              onPrimary: white, 
+              onSurface: swamp,
+              secondary: swamp,
+              onSecondary: white,
+              outline: swamp
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: white,
+                backgroundColor: swamp
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
       context: context,
       initialTime: TimeOfDay.fromDateTime(date),
     );
@@ -54,9 +75,31 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
+      builder:(context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: swamp, 
+              onPrimary: white, 
+              onSurface: swamp,
+              secondary: swamp,
+              onSecondary: bog,
+              outline: swamp, 
+              outlineVariant: swamp 
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: white,
+                backgroundColor: swamp
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
       context: context,
+      firstDate: DateTime.utc(0, 0, 0),
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
     );
     if (picked != null) {
@@ -115,8 +158,9 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
         child: Form(
           key: _formKey,
           child: Column(
+            // spacing: 10.0, messes with SizedBoxes
             children: <Widget>[
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 12.0),
               DropdownButtonFormField<int>(
                 value: projectId,
                 onChanged: (int? newValue) {
@@ -133,6 +177,7 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                   );
                 }).toList(),
               ),
+              const SizedBox(height: 10.0),
               DropdownButtonFormField<int>(
                 value: taskId,
                 onChanged: (int? newValue) {
@@ -149,6 +194,7 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                   );
                 }).toList(),
               ),
+              const SizedBox(height: 12.0),
               Row(
                 children: [
                   Expanded(
@@ -175,7 +221,7 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16.0),
+                  const SizedBox(width: 15.0),
                   Expanded(
                     child: InkWell(
                       onTap: () => _selectTime(context),
@@ -202,6 +248,7 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                   ),
                 ]
               ),
+              const SizedBox(height: 12.0),
               TextFormField(
                 decoration: InputDecoration(labelText: "Total Time (hours)"),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -216,7 +263,10 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                 },
                 onSaved: (value) => totalTime = double.parse(value!),
               ),
+              const SizedBox(height: 10.0),
               TextFormField(
+                maxLines: 3,
+                textAlignVertical: TextAlignVertical.top,
                 decoration: InputDecoration(labelText: "Notes"),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -226,7 +276,9 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                 },
                 onSaved: (value) => notes = value!,
               ),
+              const SizedBox(height: 10.0),
               ElevatedButton(
+                style: ButtonStyle(),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
@@ -252,10 +304,13 @@ class _AddTimeEntryScreenState extends State<AddTimeEntryScreen> {
                       notes: notes,
                     );
 
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen())
+                    );
                   }
                 },
-                child: Text("Save"),
+                child: Text("Add"),
               )
             ],
           ),

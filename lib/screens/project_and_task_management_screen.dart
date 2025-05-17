@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,8 @@ import "../constants/colors.dart";
 
 import "../widgets/empty_screen_text_builder.dart";
 import "../widgets/edit_item_dialog.dart";
+import "../widgets/add_item_dialog.dart";
+
 import '../providers/project_task_provider.dart';
 
 class ProjectTaskManagementScreen extends StatefulWidget {
@@ -89,6 +92,7 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
 
                   return ListTile(
                     title: Text(project.name),
+                    textColor: night,
                     onTap: () {
                       editController = TextEditingController(text: project.name);
                       buildEditItemDialog(
@@ -96,7 +100,7 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
                         provider, 
                         editController, 
                         "Edit Project Name", 
-                        "Type new project name", 
+                        "Rename your project", 
                         project.id,
                         ItemTypes.project
                       );
@@ -110,7 +114,7 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
                               context, 
                               provider, 
                               "Project Deletion", 
-                              "Are you sure you want to delete this project? All associated entries will disappear along with it.", 
+                              "Are you sure you want to delete this project? All associated entries will be deleted with it.", 
                               project.id, 
                               ItemTypes.project);
               
@@ -139,6 +143,7 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
 
                   return ListTile(
                     title: Text(task.name),
+                    textColor: night,
                     onTap: () {
                       editController = TextEditingController(text: task.name);
 
@@ -147,7 +152,7 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
                         provider, 
                         editController, 
                         "Edit Task Name", 
-                        "Type new task name", 
+                        "Rename your task", 
                         task.id,
                         ItemTypes.task
                       );                    
@@ -160,9 +165,9 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
                               context, 
                               provider, // Provider.of<AppProvider>(context), 
                               "Task Deletion", 
-                              "Are you sure you want to delete this task? All associated entries will disappear along with it.", 
+                              "Are you sure you want to delete this task? All associated entries will be deleted with it.", 
                               task.id, 
-                              ItemTypes.project);
+                              ItemTypes.task);
 
                             }
                           );
@@ -177,13 +182,23 @@ class _ProjectTaskManagementState extends State<ProjectTaskManagementScreen> wit
         ]
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: night,
+        backgroundColor: orange,
         onPressed: () {
-          
+          editController = TextEditingController();
+
+          buildAddItemDialog(
+            context, 
+            Provider.of<AppProvider>(context, listen: false), 
+            editController, 
+            (_tabController.index == 0) ? "New Project " : "New Task",
+            (_tabController.index == 0) ? "Name your new project" : "Name your new task", 
+            (_tabController.index == 0) ? ItemTypes.project : ItemTypes.task
+            );
+
         },
         child: Icon(Icons.add),
-        tooltip: 'Add Project/Task',
+        tooltip: "Add Project/Task", // tooltip doesnt change when _tabController.index changes for whatever reason, don't bother
       ),
     );
   }
-}
+} 

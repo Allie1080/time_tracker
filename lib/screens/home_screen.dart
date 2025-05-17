@@ -41,74 +41,11 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
 
   }
 
-
-  // Widget _buildEntryTab(List<TimeEntry> entryGroup, AppProvider provider) {
-  //   return Consumer<AppProvider>(
-  //       builder: (context, provider, child) {
-  //         return ListView.builder(
-  //           itemCount: entryGroup.length,
-  //           itemBuilder: (context, index) {
-  //             final entry = entryGroup[index];
-  //             final task = provider.tasks.firstWhere((task) => task.id == entry.taskId);
-  //             final project = provider.projects.firstWhere((project) => project.id == entry.projectId);
-
-  //             return Card( 
-  //               shadowColor: bog,
-  //               child: ListTile(
-  //                   title: RichText(
-  //                     text: TextSpan(
-  //                       style: const TextStyle(
-  //                         color: black,
-  //                         fontSize: 18.0
-  //                       ),
-  //                       children: [
-  //                         TextSpan(
-  //                           text: "[${project.name.toUpperCase()}] ",
-  //                           style: const TextStyle(fontWeight: FontWeight.bold) 
-  //                         ),
-  //                         TextSpan(text: "${task.name}")
-
-  //                       ]
-  //                     )
-  //                   ),
-  //                   subtitle:
-  //                       Text(
-  //                       "Total Time: ${entry.totalTime} hours\n"
-  //                       "${DateFormat.yMMMd().add_jm().format(entry.date)}\n"
-  //                       "Notes: ${entry.notes}"),
-  //                   trailing: 
-  //                     IconButton(
-  //                       icon: const Icon(Icons.delete, color: red),
-  //                       onPressed: () {
-                          
-  //                       } 
-  //                   ),
-  //                   subtitleTextStyle: TextStyle(
-  //                     color: gray,
-  //                     fontSize: 12.0
-  //                   ),
-  //                   enabled: true,
-  //                   onTap: () {
-  //                     // This could open a detailed view or edit screen
-  //                   },
-  //                   onLongPress: () {
-  //                     isDeleteMode = true;
-  //                   },
-  //                 )
-  //               );
-  //           },
-  //         );
-  //       },
-  //     )
-
-  // }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Time Entries"),
+        title: Text("Time Tracking"),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Builder(
@@ -118,6 +55,7 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
             )
           )
         ),
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: bog,
@@ -151,8 +89,8 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
                   final Project project = provider.projects.firstWhere((project) => project.id == entry.projectId);
 
                   return Card( 
-                    shadowColor: bog,
                     child: ListTile(
+                        contentPadding: EdgeInsets.only(top: 7.0, bottom: 7.0, left: 10.0, right: 10.0),
                         title: RichText(
                           text: TextSpan(
                             style: const TextStyle(
@@ -161,11 +99,13 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                             children: [
                               TextSpan(
-                                text: "[${project.name.toUpperCase()}] ",
+                                text: project.name,
                                 style: const TextStyle(fontWeight: FontWeight.bold) 
                               ),
-                              TextSpan(text: task.name)
-
+                              TextSpan(
+                                text: " - ${task.name}", 
+                                style: const TextStyle(color: bog)
+                              )
                             ]
                           )
                         ),
@@ -215,9 +155,73 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
                   )
               ) :
               ListView.builder(
-                itemCount: provider.entries.length,
+                itemCount: provider.projects.length,
                 itemBuilder: (context, index) {
                   final Project project = provider.projects[index];
+                  final List<TimeEntry> entries = List<TimeEntry>.from(provider.entries.where((entry) => entry.projectId == project.id));
+
+                  
+                  return (entries.isEmpty) ? SizedBox(height: 0.0): 
+                  Card( 
+                    shadowColor: bog,
+                    child: ListTile(
+                        contentPadding: EdgeInsets.only(top: 7.0, bottom: 7.0, left: 10.0, right: 10.0),
+                        title: Text(
+                          project.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: swamp, fontSize: 18.0) 
+                        ),
+                        subtitle:
+                            Text(
+                              () {
+                                String entryListText = "";
+
+                                for (var entry in entries) {
+                                  entryListText += "- ${provider.tasks.firstWhere((task) => task.id == entry.taskId).name}: ${entry.totalTime} hours (${DateFormat.yMMMd().add_jm().format(entry.date)})";
+                                  
+                                  if (entry != entries.last) {
+                                    entryListText += "\n";
+
+                                  }
+
+                                };
+
+                                return entryListText;
+
+                              }.call()
+                            ),
+                        trailing: 
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: red),
+                            onPressed: () {
+                              buildConfirmDeletionDialog(
+                                context,
+                                provider,
+                                "Project Deletion",
+                                "Are you sure you want to delete this project? All associated entries would be deleted with it.",
+                                project.id,
+                                ItemTypes.project
+                                );
+
+                            }
+                        ),
+                        subtitleTextStyle: TextStyle(
+                          color: gray,
+                          fontSize: 12.0
+                        ),
+                        enabled: true,
+                        onTap: () {
+                          // This could open a detailed view or edit screen
+                        },
+                        onLongPress: () {
+                        },
+                      )
+                    );
+                },
+              );
+              // ListView.builder(
+              //   itemCount: provider.entries.length,
+              //   itemBuilder: (context, index) {
+              //     final Project project = provider.projects[index];
                   // final entries = provider.entries.where((entry) => entry.projectId == entry.id);
                   // final tasks = provider.tasks.where((task) => task.id == entries[0].taskId);
 
@@ -264,13 +268,14 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
                   //       },
                   //     )
                   //   );
-                },
-              );
+            //     },
+            //   );
             },
           )
         ]
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: orange,
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -303,14 +308,16 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             ListTile(
               title: const Text("Manage Projects and Tasks"),
-              enabled: true
+              enabled: true,
+              textColor: swamp
             ),
             ListTile(
-              leading: const Icon(Icons.folder),
+              leading: const Icon(Icons.folder, color: swamp),
               title: const Text('Projects'),
+              textColor: swamp,
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ProjectTaskManagementScreen(initialTab: 0)
@@ -319,11 +326,12 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.task),
+              leading: const Icon(Icons.task, color: swamp),
               title: const Text('Tasks'),
+              textColor: swamp,
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ProjectTaskManagementScreen(initialTab: 1)
@@ -337,5 +345,4 @@ class _HomePageState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 }
-
     

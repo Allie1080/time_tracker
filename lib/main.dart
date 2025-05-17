@@ -42,8 +42,6 @@ class MyApp extends StatelessWidget {
             ),
             iconTheme: const IconThemeData(color: white),
           ),
-          // textTheme: TextStyleTextTheme(Theme.of(context).textTheme),
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: createMaterialColor(swamp)).copyWith(secondary: bog),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: swamp,
@@ -57,49 +55,22 @@ class MyApp extends StatelessWidget {
           ),
           inputDecorationTheme: InputDecorationTheme(
             border: const OutlineInputBorder(),
+            outlineBorder: const BorderSide(color: bog),
             focusedBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: bog),
             ),
-            labelStyle: TextStyle(color: Colors.black87),
-            hintStyle: TextStyle(color: Colors.grey),
+            labelStyle: TextStyle(color: black),
+            hintStyle: TextStyle(color: gray),
           ),
           cardTheme: CardTheme(
             elevation: 2.0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(5.0)
             ),
           ),
         ),
-        // home: const HomePage(currentUserId: currentUserId), // Set LoginPage as the initial screen
         home: HomeScreen(), // Set LoginPage as the initial screen
-        routes: {
-          "/home": (context) => HomeScreen(),
-          // "/postQuest": (context) => const PostQuestScreen(currentUserId: currentUserId),
-          // "/questDetails": (context) => const QuestDetailsPage(questId: 0, currentUserId: "A23-36640",),
-          // "/login": (context) => const LoginPage(),
-          // "/register": (context) => const RegistrationPage(), // Add the registration route
-        },
       ),
     );
   }
-}
-
-MaterialColor createMaterialColor(Color color) {
-  List strengths = <double>[.05];
-  Map<int, Color> swatch = <int, Color>{};
-  final int r = color.red, g = color.green, b = color.blue;
-
-  for (int i = 1; i < 10; i++) {
-    strengths.add(0.1 * i);
-  }
-  for (final double strength in strengths) {
-    final double ds = 0.5 - strength;
-    swatch[(strength * 1000).round()] = Color.fromRGBO(
-      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
-      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
-      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
-      1,
-    );
-  }
-  return MaterialColor(color.value, swatch);
 }

@@ -185,7 +185,7 @@ class AppProvider with ChangeNotifier {
 
     }
     
-    _tasks.removeWhere((project) => project.id == id);
+    _projects.removeWhere((project) => project.id == id);
     _saveProjectsToStorage();
     notifyListeners();
 
